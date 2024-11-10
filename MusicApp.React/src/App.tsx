@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
+import GetFoldersApiResponse from "./types";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [data, setData] = useState<string | null>(null);
+  const [data, setData] = useState<GetFoldersApiResponse | null>(null);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -15,10 +14,11 @@ function App() {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const result = await response.json();
-        setData(result.FolderName);
+        console.log(result);
+        setData(result as GetFoldersApiResponse);
       } catch (error) {
         console.error("Failed to get Data:", error);
-        setData("Error Loading Data");
+        setError("Error Loading Data");
       }
     };
     fetchData();
@@ -27,21 +27,14 @@ function App() {
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        {data &&
+          data.Data.map((folder) => (
+            <>
+              <p key={folder.FolderName}>Folder Name: {folder.FolderName}</p>
+              <img src={folder.CoverImg} />
+            </>
+          ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
     </>
   );
 }
