@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import GetFoldersApiResponse from "./types";
+import { Link } from "react-router-dom";
 
 function App() {
   const [data, setData] = useState<GetFoldersApiResponse | null>(null);
@@ -29,10 +30,10 @@ function App() {
       <div>
         {data &&
           data.Data.map((folder) => (
-            <>
-              <p key={folder.FolderName}>Folder Name: {folder.FolderName}</p>
+            <Link to={`/album/${folder.FolderName}`} key={folder.FolderName}>
+              <p>Folder Name: {folder.FolderName}</p>
               <img src={folder.CoverImg} />
-            </>
+            </Link>
           ))}
       </div>
     </>
