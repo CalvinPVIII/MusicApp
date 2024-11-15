@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./App.css";
+import "./Styles/App.css";
 import GetFoldersApiResponse from "./types";
 import { Link } from "react-router-dom";
 
@@ -27,12 +27,16 @@ function App() {
 
   return (
     <>
-      <div>
+      <div className="flex flex-wrap gap-6 justify-center p-6 bg-gray-600 object-corner rounded-xl">
         {data &&
           data.Data.map((folder) => (
-            <Link to={`/album/${folder.FolderName}`} key={folder.FolderName}>
+            <Link className="text-gray-100" to={`/album/${folder.FolderName}`} key={folder.FolderName}>
               <p>Folder Name: {folder.FolderName}</p>
-              <img src={folder.CoverImg} />
+              <img src={folder.CoverImg} className="w-full h-48 object-corner rounded-xl" />
+              <div className="p-4">
+                <h3 className="text-lg font-bold text-gray-100">{folder.FolderName}</h3>
+                <p className="text-sm text-gray-200">{folder.NumberOfSongs}</p>
+              </div>
             </Link>
           ))}
       </div>

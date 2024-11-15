@@ -27,8 +27,11 @@ public class HomeController : WebApiController
             List<FolderInfo> folders = new List<FolderInfo> { };
             foreach (var folderName in folderNames)
             {
-                FolderInfo folder = GetFolderInfo(folderName);
-                folders.Add(folder);
+                FolderInfo folder = GetFolderInfo(folderName, false);
+                if (folder.NumberOfSongs != 0)
+                {
+                    folders.Add(folder);
+                }
             }
 
             return new ApiResponseDTO { Status = "success", Data = folders };
@@ -45,7 +48,7 @@ public class HomeController : WebApiController
     {
         try
         {
-            FolderInfo folder = GetFolderInfo(albumName);
+            FolderInfo folder = GetFolderInfo(albumName, true);
             return new ApiResponseDTO() { Status = "success", Data = folder };
         }
         catch (Exception ex)
@@ -55,18 +58,28 @@ public class HomeController : WebApiController
         }
     }
 
-    private FolderInfo GetFolderInfo(string folderPath)
+    private FolderInfo GetFolderInfo(string folderPath, bool getSongData)
     {
         // for files will need to separate between songs/cover img
-        string name = GetFolderName(folderPath);
+        string name = RemovePath(folderPath);
         string path = Path.Combine(_appDirectoryLocation, folderPath);
-        string img = ImageHelper.LoadImage(Path.Combine(path, "cover.png")); // change this to be more than just png
+        string img = FileHelper.LoadImage(Path.Combine(path, "cover.png")); // change this to be more than just png
         var files = Directory.GetFiles(path);
-        var folder = new FolderInfo() { FolderName = name, FolderPath = path, CoverImg = img, NumberOfSongs = files.Count() };
+        List<Song> songs = new List<Song>();
+        foreach (var songFile in files)
+        {
+            Song song = new Song() { SongName = RemovePath(songFile) };
+            if (getSongData)
+            {
+                song.SongData = FileHelper.LoadAudio(Path.Combine(path, songFile));
+            }
+            songs.Add(song);
+        }
+        var folder = new FolderInfo() { FolderName = name, FolderPath = path, CoverImg = img, NumberOfSongs = files.Count(), Songs = songs };
         return folder;
     }
 
-    private static string GetFolderName(string folderPath)
+    private static string RemovePath(string folderPath)
     {
         string pattern = @"(?<=\/)[^\/]+$";
 
@@ -81,6 +94,7 @@ public class HomeController : WebApiController
             return folderPath;
         }
     }
+
 
 
 }
